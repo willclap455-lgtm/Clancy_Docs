@@ -103,6 +103,50 @@ HIGH_CONTRAST_PALETTE = {
     "stone": (0x28, (0, 0, 0)),
 }
 
+MEDIEVAL_MANUSCRIPT_PALETTE = {
+    "navy": (0x21, (73, 46, 26)),
+    "slate": (0x22, (120, 86, 52)),
+    "mist": (0x23, (232, 214, 176)),
+    "ivory": (0x24, (245, 235, 207)),
+    "gold": (0x25, (168, 123, 29)),
+    "coral": (0x26, (129, 32, 32)),
+    "sage": (0x27, (58, 41, 23)),
+    "stone": (0x28, (112, 93, 74)),
+}
+
+TREASURE_MAP_PALETTE = {
+    "navy": (0x21, (44, 78, 55)),
+    "slate": (0x22, (74, 108, 78)),
+    "mist": (0x23, (214, 201, 141)),
+    "ivory": (0x24, (240, 228, 181)),
+    "gold": (0x25, (163, 109, 26)),
+    "coral": (0x26, (143, 76, 35)),
+    "sage": (0x27, (60, 68, 38)),
+    "stone": (0x28, (111, 99, 66)),
+}
+
+SYNTHWAVE_OUTRUN_PALETTE = {
+    "navy": (0x21, (30, 12, 58)),
+    "slate": (0x22, (78, 25, 119)),
+    "mist": (0x23, (50, 236, 255)),
+    "ivory": (0x24, (25, 13, 45)),
+    "gold": (0x25, (255, 94, 194)),
+    "coral": (0x26, (255, 196, 0)),
+    "sage": (0x27, (241, 238, 255)),
+    "stone": (0x28, (108, 58, 191)),
+}
+
+BRUTALIST_MONOCHROME_PALETTE = {
+    "navy": (0x21, (18, 18, 18)),
+    "slate": (0x22, (48, 48, 48)),
+    "mist": (0x23, (235, 235, 235)),
+    "ivory": (0x24, (255, 255, 255)),
+    "gold": (0x25, (0, 0, 0)),
+    "coral": (0x26, (210, 210, 210)),
+    "sage": (0x27, (20, 20, 20)),
+    "stone": (0x28, (120, 120, 120)),
+}
+
 STAR_WARS_PALETTE = {
     "navy": (0x21, (12, 12, 32)),
     "slate": (0x22, (33, 33, 74)),
@@ -171,6 +215,34 @@ THEMES = {
     "high-contrast": ThemeProfile(
         name="high-contrast",
         palette=HIGH_CONTRAST_PALETTE,
+        title_font_name="Arial Black",
+        heading_font_name="Arial Black",
+        body_font_name="Arial",
+    ),
+    "medieval-manuscript": ThemeProfile(
+        name="medieval-manuscript",
+        palette=MEDIEVAL_MANUSCRIPT_PALETTE,
+        title_font_name="Book Antiqua",
+        heading_font_name="Book Antiqua",
+        body_font_name="Times New Roman",
+    ),
+    "fantasy-forest-map": ThemeProfile(
+        name="fantasy-forest-map",
+        palette=TREASURE_MAP_PALETTE,
+        title_font_name="Book Antiqua",
+        heading_font_name="Book Antiqua",
+        body_font_name="Georgia",
+    ),
+    "synthwave-outrun": ThemeProfile(
+        name="synthwave-outrun",
+        palette=SYNTHWAVE_OUTRUN_PALETTE,
+        title_font_name="Arial Black",
+        heading_font_name="Arial Black",
+        body_font_name="Arial",
+    ),
+    "brutalist-monochrome": ThemeProfile(
+        name="brutalist-monochrome",
+        palette=BRUTALIST_MONOCHROME_PALETTE,
         title_font_name="Arial Black",
         heading_font_name="Arial Black",
         body_font_name="Arial",
@@ -368,6 +440,10 @@ def style_spec_for_cell(
     is_vegas = theme.name == "vegas-casino"
     is_cyberpunk = theme.name == "cyberpunk"
     is_high_contrast = theme.name == "high-contrast"
+    is_medieval = theme.name == "medieval-manuscript"
+    is_treasure = theme.name == "fantasy-forest-map"
+    is_outrun = theme.name == "synthwave-outrun"
+    is_brutalist = theme.name == "brutalist-monochrome"
     is_clancy = is_clancy_dark or is_clancy_light
     title_font = theme.title_font_name
     heading_font = theme.heading_font_name
@@ -379,7 +455,7 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="mist" if is_star_wars else "mist" if is_cyberpunk else "gold" if is_vegas else "black" if is_high_contrast else "sage" if (is_clancy or is_oldschool) else "black",
+            font_colour="mist" if is_star_wars else "mist" if (is_cyberpunk or is_outrun) else "gold" if is_vegas else "sage" if is_medieval else "navy" if is_treasure else "white" if is_brutalist else "black" if is_high_contrast else "sage" if (is_clancy or is_oldschool) else "black",
             border_colour="stone",
             left=0,
             right=0,
@@ -390,6 +466,67 @@ def style_spec_for_cell(
         )
 
     if role == "title":
+        if is_medieval:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=320,
+                bold=True,
+                font_colour="gold",
+                bg_colour="navy",
+                border_colour="coral",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
+        if is_treasure:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=320,
+                bold=True,
+                italic=True,
+                font_colour="sage",
+                bg_colour="ivory",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
+        if is_outrun:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=340,
+                bold=True,
+                font_colour="mist",
+                bg_colour="navy",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
+        if is_brutalist:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=320,
+                bold=True,
+                font_colour="white",
+                bg_colour="black",
+                border_colour="stone",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
         if is_windows_90s:
             return ThemeStyle(
                 font_name=title_font,
@@ -434,6 +571,47 @@ def style_spec_for_cell(
                 bottom=2,
                 horz=xlwt.Alignment.HORZ_CENTER,
                 wrap=False,
+            )
+        if is_brutalist:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="white",
+                bg_colour="black",
+                border_colour="stone",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_outrun:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="mist",
+                bg_colour="navy",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_treasure:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                italic=True,
+                font_colour="sage",
+                bg_colour="ivory",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_medieval:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="gold",
+                bg_colour="navy",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_LEFT,
             )
         if is_high_contrast:
             return ThemeStyle(
@@ -511,6 +689,118 @@ def style_spec_for_cell(
         )
 
     if role == "section_header":
+        if is_medieval and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="gold",
+                bg_colour="coral",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_medieval:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="sage",
+                bg_colour="mist",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_treasure and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="ivory",
+                bg_colour="navy",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_treasure:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="sage",
+                bg_colour="mist",
+                border_colour="coral",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_outrun and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="coral",
+                border_colour="mist",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_outrun:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="mist",
+                bg_colour="slate",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_brutalist and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="white",
+                bg_colour="black",
+                border_colour="stone",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_brutalist:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="black",
+                bg_colour="mist",
+                border_colour="stone",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
         if is_windows_90s and str(value).strip().upper() == "TOTAL":
             return ThemeStyle(
                 font_name=heading_font,
@@ -594,6 +884,46 @@ def style_spec_for_cell(
                 top=2,
                 bottom=2,
                 horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_brutalist:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="black",
+                bg_colour="mist",
+                border_colour="stone",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_outrun:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="mist",
+                bg_colour="slate",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_treasure:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="sage",
+                bg_colour="mist",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_medieval:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="sage",
+                bg_colour="mist",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
             )
         if is_high_contrast:
             return ThemeStyle(
@@ -708,7 +1038,19 @@ def style_spec_for_cell(
         )
 
     if role == "total_sent":
-        if is_windows_90s:
+        if is_medieval:
+            bg_colour = "coral"
+            font_colour = "gold"
+        elif is_treasure:
+            bg_colour = "navy"
+            font_colour = "ivory"
+        elif is_outrun:
+            bg_colour = "gold"
+            font_colour = "navy"
+        elif is_brutalist:
+            bg_colour = "black"
+            font_colour = "white"
+        elif is_windows_90s:
             bg_colour = "slate"
             font_colour = "white"
         elif is_vegas:
@@ -736,7 +1078,19 @@ def style_spec_for_cell(
             bg_colour = "mist"
             font_colour = "navy"
     elif role == "total_rec":
-        if is_windows_90s:
+        if is_medieval:
+            bg_colour = "mist"
+            font_colour = "sage"
+        elif is_treasure:
+            bg_colour = "mist"
+            font_colour = "sage"
+        elif is_outrun:
+            bg_colour = "mist"
+            font_colour = "navy"
+        elif is_brutalist:
+            bg_colour = "mist"
+            font_colour = "black"
+        elif is_windows_90s:
             bg_colour = "mist"
             font_colour = "navy"
         elif is_vegas:
@@ -764,7 +1118,19 @@ def style_spec_for_cell(
             bg_colour = "ivory"
             font_colour = "navy"
     elif role == "not_found":
-        if is_windows_90s:
+        if is_medieval:
+            bg_colour = "gold"
+            font_colour = "sage"
+        elif is_treasure:
+            bg_colour = "coral"
+            font_colour = "ivory"
+        elif is_outrun:
+            bg_colour = "slate"
+            font_colour = "mist"
+        elif is_brutalist:
+            bg_colour = "white"
+            font_colour = "black"
+        elif is_windows_90s:
             bg_colour = "gold"
             font_colour = "navy"
         elif is_vegas:
@@ -798,12 +1164,12 @@ def style_spec_for_cell(
     if role in {"total_sent", "total_rec", "not_found"}:
         if colx == 0:
             return ThemeStyle(
-                font_name=heading_font if (is_clancy or is_oldschool or is_star_wars or is_windows_90s or is_vegas or is_cyberpunk or is_high_contrast) else body_font,
+                font_name=heading_font if (is_clancy or is_oldschool or is_star_wars or is_windows_90s or is_vegas or is_cyberpunk or is_high_contrast or is_medieval or is_treasure or is_outrun or is_brutalist) else body_font,
                 font_height=220,
                 bold=True,
                 font_colour=font_colour,
                 bg_colour=bg_colour,
-                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+                border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
                 left=1,
                 right=1,
                 top=1,
@@ -811,12 +1177,12 @@ def style_spec_for_cell(
                 horz=xlwt.Alignment.HORZ_RIGHT,
             )
         return ThemeStyle(
-            font_name=heading_font if (is_clancy or is_oldschool or is_star_wars or is_windows_90s or is_vegas or is_cyberpunk or is_high_contrast) else body_font,
+            font_name=heading_font if (is_clancy or is_oldschool or is_star_wars or is_windows_90s or is_vegas or is_cyberpunk or is_high_contrast or is_medieval or is_treasure or is_outrun or is_brutalist) else body_font,
             font_height=220,
             bold=True,
             font_colour=font_colour,
             bg_colour=bg_colour,
-            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+            border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
             left=1,
             right=1,
             top=1,
@@ -828,9 +1194,9 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             bold=colx == 7,
-            font_colour="white" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool) else "navy",
-            bg_colour="black" if is_high_contrast else "slate" if is_star_wars else "navy" if is_vegas else "slate" if is_cyberpunk else "ivory" if is_oldschool else "mist" if is_clancy_dark else "ivory" if is_clancy_light else "ivory",
-            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+            font_colour="white" if is_high_contrast else "mist" if (is_star_wars or is_outrun) else "gold" if is_vegas else "sage" if (is_clancy or is_oldschool or is_medieval or is_treasure) else "black" if is_brutalist else "navy",
+            bg_colour="black" if (is_high_contrast or is_brutalist) else "slate" if (is_star_wars or is_outrun) else "navy" if is_vegas else "ivory" if (is_oldschool or is_treasure) else "mist" if (is_medieval or is_clancy_dark) else "ivory" if is_clancy_light else "ivory",
+            border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
             left=1,
             right=1,
             top=1,
@@ -839,7 +1205,15 @@ def style_spec_for_cell(
         )
 
     if role in {"sent", "received", "body"}:
-        if is_high_contrast:
+        if is_brutalist:
+            bg_colour = "coral" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_outrun:
+            bg_colour = "slate" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_treasure:
+            bg_colour = "mist" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_medieval:
+            bg_colour = "mist" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_high_contrast:
             bg_colour = "black" if role == "received" else "white" if colx <= MAIN_TABLE_LAST_COL else None
         elif is_vegas:
             bg_colour = "coral" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
@@ -860,9 +1234,9 @@ def style_spec_for_cell(
         spec = ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="white" if is_high_contrast and role != "body" else "black" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
+            font_colour="white" if is_high_contrast and role != "body" else "black" if is_high_contrast else "white" if is_brutalist and role != "body" else "black" if is_brutalist else "mist" if (is_star_wars or is_outrun) else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool or is_medieval or is_treasure) else "navy" if role != "body" else "black",
             bg_colour=bg_colour,
-            border_colour="gold" if is_high_contrast and colx <= MAIN_TABLE_LAST_COL else "gold" if is_cyberpunk and colx <= MAIN_TABLE_LAST_COL else "coral" if (is_star_wars or is_vegas) and colx <= MAIN_TABLE_LAST_COL else "stone",
+            border_colour="stone" if is_brutalist and colx <= MAIN_TABLE_LAST_COL else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) and colx <= MAIN_TABLE_LAST_COL else "coral" if (is_star_wars or is_vegas or is_treasure) and colx <= MAIN_TABLE_LAST_COL else "stone",
             horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
             bold=colx == 7 and sheet_name != "Compatibility Report",
         )
@@ -871,9 +1245,9 @@ def style_spec_for_cell(
                 font_name=body_font,
                 font_height=200,
                 bold=True,
-                font_colour="black" if is_high_contrast else "gold" if is_star_wars else "navy" if is_oldschool else "gold" if (is_clancy or is_vegas or is_cyberpunk) else "navy",
+                font_colour="black" if is_high_contrast else "white" if is_brutalist else "gold" if (is_star_wars or is_outrun) else "navy" if (is_oldschool or is_medieval or is_treasure) else "gold" if (is_clancy or is_vegas or is_cyberpunk) else "navy",
                 bg_colour=bg_colour,
-                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+                border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if colx == 7 and sheet_name != "Compatibility Report":
@@ -881,27 +1255,27 @@ def style_spec_for_cell(
                 font_name=body_font,
                 font_height=200,
                 bold=True,
-                font_colour="black" if is_high_contrast else "navy" if (is_oldschool or is_star_wars or is_vegas or is_cyberpunk) else "white" if is_clancy else "navy",
-                bg_colour="gold" if (is_clancy or is_oldschool or is_star_wars or is_vegas or is_cyberpunk or is_high_contrast) else None,
-                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone" if is_oldschool else "gold" if is_clancy else "stone",
+                font_colour="black" if is_high_contrast else "white" if is_brutalist else "navy" if (is_oldschool or is_star_wars or is_vegas or is_cyberpunk or is_medieval or is_treasure or is_outrun) else "white" if is_clancy else "navy",
+                bg_colour="mist" if is_brutalist else "gold" if (is_clancy or is_oldschool or is_star_wars or is_vegas or is_cyberpunk or is_high_contrast or is_medieval or is_outrun) else "navy" if is_treasure else None,
+                border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone" if is_oldschool else "gold" if is_clancy else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if "%" in fmt or colx >= 8:
             return ThemeStyle(
                 font_name=body_font,
                 font_height=200,
-                font_colour="black" if is_high_contrast else "coral" if is_star_wars else "gold" if is_vegas else "coral" if is_cyberpunk else "sage" if is_oldschool else "slate" if is_clancy else "navy",
-                bg_colour="white" if is_high_contrast and colx <= MAIN_TABLE_LAST_COL else "ivory" if (is_clancy or is_oldschool or is_star_wars or is_vegas or is_cyberpunk) and colx <= MAIN_TABLE_LAST_COL else None,
-                border_colour="gold" if is_high_contrast and colx <= MAIN_TABLE_LAST_COL else "gold" if is_cyberpunk and colx <= MAIN_TABLE_LAST_COL else "coral" if (is_star_wars or is_vegas) and colx <= MAIN_TABLE_LAST_COL else "stone",
+                font_colour="black" if is_high_contrast else "black" if is_brutalist else "coral" if is_star_wars else "gold" if is_vegas else "coral" if (is_cyberpunk or is_outrun) else "sage" if (is_oldschool or is_medieval or is_treasure) else "slate" if is_clancy else "navy",
+                bg_colour="white" if (is_high_contrast or is_brutalist) and colx <= MAIN_TABLE_LAST_COL else "ivory" if (is_clancy or is_oldschool or is_star_wars or is_vegas or is_cyberpunk or is_medieval or is_treasure or is_outrun) and colx <= MAIN_TABLE_LAST_COL else None,
+                border_colour="stone" if is_brutalist and colx <= MAIN_TABLE_LAST_COL else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) and colx <= MAIN_TABLE_LAST_COL else "coral" if (is_star_wars or is_vegas or is_treasure) and colx <= MAIN_TABLE_LAST_COL else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if colx >= 2:
             return ThemeStyle(
                 font_name=body_font,
                 font_height=200,
-                font_colour="black" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
+                font_colour="black" if is_high_contrast else "black" if is_brutalist else "mist" if (is_star_wars or is_outrun) else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool or is_medieval or is_treasure) else "navy" if role != "body" else "black",
                 bg_colour=bg_colour,
-                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+                border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         return spec
@@ -1072,9 +1446,9 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="white" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "black",
-            bg_colour="black" if is_high_contrast else "slate" if is_star_wars else "navy" if is_vegas else "slate" if is_cyberpunk else "ivory" if is_oldschool else "mist",
-            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+            font_colour="white" if is_high_contrast else "black" if is_brutalist else "mist" if is_star_wars else "gold" if is_vegas else "mist" if (is_cyberpunk or is_outrun) else "sage" if (is_medieval or is_treasure) else "black",
+            bg_colour="black" if (is_high_contrast or is_brutalist) else "slate" if is_star_wars else "navy" if is_vegas else "slate" if (is_cyberpunk or is_outrun) else "ivory" if (is_oldschool or is_treasure) else "mist",
+            border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
             horz=xlwt.Alignment.HORZ_LEFT,
         )
 
@@ -1082,9 +1456,9 @@ def style_spec_for_cell(
         return centered_right if colx == 4 else centered if colx == 5 else ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="black" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "coral" if is_cyberpunk else "black",
-            bg_colour="white" if is_high_contrast else "ivory" if (is_star_wars or is_vegas or is_cyberpunk) else "mist" if is_oldschool else "ivory",
-            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
+            font_colour="black" if is_high_contrast else "black" if is_brutalist else "mist" if is_star_wars else "gold" if is_vegas else "coral" if (is_cyberpunk or is_outrun) else "sage" if (is_medieval or is_treasure) else "black",
+            bg_colour="white" if (is_high_contrast or is_brutalist) else "ivory" if (is_star_wars or is_vegas or is_cyberpunk or is_treasure or is_outrun) else "mist" if (is_oldschool or is_medieval) else "ivory",
+            border_colour="stone" if is_brutalist else "gold" if (is_high_contrast or is_cyberpunk or is_outrun or is_medieval) else "coral" if (is_star_wars or is_vegas or is_treasure) else "stone",
         )
 
     return ThemeStyle()
@@ -1248,6 +1622,81 @@ def themed_cell_value(
             "Total Rec:": "TOTAL RECEIVED:",
             "Not Found:": "NOT FOUND:",
             "Minor loss of fidelity": "Accessibility contrast warning",
+        }
+        return replacements.get(value, value)
+    if theme.name == "medieval-manuscript":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "Royal Ledger of the Golden Month"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "Royal Ledger Template"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"Scribe's Compatibility Chronicle - {output_filename}"
+        replacements = {
+            "Other States": "Western Kingdoms",
+            "Other States-POLK": "Western Kingdoms - Polk Province",
+            "Colorado DMV ": "Capital Registry",
+            "TOTAL": "GRAND LEDGER",
+            "Total Sent:": "Missives Sent:",
+            "Total Rec:": "Missives Returned:",
+            "Not Found:": "Lost to the Realm:",
+            "Sent": "Dispatched",
+            "Rec'd": "Received",
+            "Minor loss of fidelity": "Minor ink loss detected",
+        }
+        return replacements.get(value, value)
+    if theme.name == "fantasy-forest-map":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "Forest Treasure Map - Monthly Survey"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "Forest Treasure Map Template"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"Treasure Map Survey Report - {output_filename}"
+        replacements = {
+            "Other States": "Whispering Woods",
+            "Other States-POLK": "Whispering Woods - Polk Trail",
+            "Colorado DMV ": "Emerald Keep",
+            "TOTAL": "TREASURE TOTAL",
+            "Total Sent:": "Clues Marked:",
+            "Total Rec:": "Caches Found:",
+            "Not Found:": "Lost in the Thicket:",
+            "Sent": "Mapped",
+            "Rec'd": "Found",
+            "Minor loss of fidelity": "Minor parchment wear",
+        }
+        return replacements.get(value, value)
+    if theme.name == "synthwave-outrun":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "SUNSET CIRCUIT REPORT // APRIL 2025"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "SUNSET CIRCUIT TEMPLATE"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"Outrun System Check - {output_filename}"
+        replacements = {
+            "Other States": "Sunset Sectors",
+            "Other States-POLK": "Sunset Sectors - Polk Drive",
+            "Colorado DMV ": "Chrome Coast Hub",
+            "TOTAL": "SUNSET TOTAL",
+            "Total Sent:": "Pulses Sent:",
+            "Total Rec:": "Echoes Returned:",
+            "Not Found:": "Signal Fade:",
+            "Sent": "Broadcast",
+            "Rec'd": "Echoed",
+            "Minor loss of fidelity": "Minor VHS drift",
+        }
+        return replacements.get(value, value)
+    if theme.name == "brutalist-monochrome":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "MONTHLY REPORT / MONO EDITION"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "TEMPLATE / MONO EDITION"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"MONO COMPATIBILITY REPORT / {output_filename}"
+        replacements = {
+            "TOTAL": "TOTAL BLOCK",
+            "Total Sent:": "OUTPUT TOTAL:",
+            "Total Rec:": "INPUT TOTAL:",
+            "Not Found:": "NULL SET:",
+            "Minor loss of fidelity": "Monochrome degradation warning",
         }
         return replacements.get(value, value)
 
@@ -1456,6 +1905,156 @@ def create_high_contrast_assets(asset_dir: Path) -> dict[str, Path]:
     }
 
 
+def create_medieval_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "medieval_banner.bmp"
+    side_art_path = asset_dir / "medieval_side.bmp"
+    compat_art_path = asset_dir / "medieval_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (245, 235, 207))
+    draw = ImageDraw.Draw(banner)
+    draw.rectangle((10, 10, 890, 170), outline=(168, 123, 29), width=6)
+    draw.rectangle((28, 28, 872, 152), outline=(129, 32, 32), width=2)
+    draw.text((210, 38), "ROYAL LEDGER OF THE REALM", fill=(73, 46, 26))
+    draw.text((255, 88), "ILLUMINATED MONTHLY RECORD", fill=(129, 32, 32))
+    draw.ellipse((40, 45, 90, 95), outline=(168, 123, 29), width=3)
+    draw.ellipse((810, 45, 860, 95), outline=(168, 123, 29), width=3)
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (245, 235, 207))
+    draw = ImageDraw.Draw(side)
+    draw.rectangle((12, 12, 168, 248), outline=(168, 123, 29), width=4)
+    draw.text((36, 22), "S C R I B E", fill=(73, 46, 26))
+    draw.rectangle((30, 60, 150, 100), outline=(129, 32, 32), width=2)
+    draw.text((56, 74), "SEAL", fill=(129, 32, 32))
+    draw.rectangle((30, 130, 150, 170), outline=(168, 123, 29), width=2)
+    draw.text((54, 144), "CROWN", fill=(73, 46, 26))
+    draw.line((38, 208, 142, 208), fill=(129, 32, 32), width=3)
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (245, 235, 207))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((8, 8, 412, 112), outline=(168, 123, 29), width=4)
+    draw.text((35, 22), "SCRIBE'S COMPATIBILITY CHRONICLE", fill=(73, 46, 26))
+    draw.text((72, 66), "SEALED BY THE ARCHIVIST", fill=(129, 32, 32))
+    compat.save(compat_art_path)
+
+    return {"banner": banner_path, "side": side_art_path, "compat": compat_art_path}
+
+
+def create_treasure_map_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "treasure_banner.bmp"
+    side_art_path = asset_dir / "treasure_side.bmp"
+    compat_art_path = asset_dir / "treasure_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (240, 228, 181))
+    draw = ImageDraw.Draw(banner)
+    draw.rectangle((18, 18, 882, 162), outline=(163, 109, 26), width=4)
+    draw.text((215, 34), "FANTASY FOREST TREASURE MAP", fill=(60, 68, 38))
+    draw.text((260, 78), "SURVEY OF HIDDEN BOOTY", fill=(143, 76, 35))
+    draw.line((80, 130, 180, 90), fill=(143, 76, 35), width=4)
+    draw.line((180, 90, 280, 120), fill=(143, 76, 35), width=4)
+    draw.text((290, 106), "X", fill=(163, 109, 26))
+    draw.ellipse((720, 40, 830, 150), outline=(44, 78, 55), width=3)
+    draw.line((775, 48, 775, 142), fill=(44, 78, 55), width=2)
+    draw.line((728, 95, 822, 95), fill=(44, 78, 55), width=2)
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (240, 228, 181))
+    draw = ImageDraw.Draw(side)
+    draw.rectangle((12, 12, 168, 248), outline=(163, 109, 26), width=3)
+    draw.ellipse((45, 28, 135, 118), outline=(44, 78, 55), width=3)
+    draw.line((90, 36, 90, 110), fill=(44, 78, 55), width=2)
+    draw.line((52, 72, 128, 72), fill=(44, 78, 55), width=2)
+    draw.text((79, 42), "N", fill=(44, 78, 55))
+    draw.text((80, 91), "S", fill=(44, 78, 55))
+    draw.text((57, 68), "W", fill=(44, 78, 55))
+    draw.text((116, 68), "E", fill=(44, 78, 55))
+    draw.text((42, 160), "X MARKS", fill=(143, 76, 35))
+    draw.text((62, 188), "THE SPOT", fill=(143, 76, 35))
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (240, 228, 181))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((10, 10, 410, 110), outline=(163, 109, 26), width=3)
+    draw.text((35, 22), "TREASURE MAP SURVEY", fill=(60, 68, 38))
+    draw.text((66, 64), "ALL TRAILS ACCOUNTED FOR", fill=(143, 76, 35))
+    compat.save(compat_art_path)
+
+    return {"banner": banner_path, "side": side_art_path, "compat": compat_art_path}
+
+
+def create_outrun_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "outrun_banner.bmp"
+    side_art_path = asset_dir / "outrun_side.bmp"
+    compat_art_path = asset_dir / "outrun_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (20, 8, 40))
+    draw = ImageDraw.Draw(banner)
+    draw.rectangle((0, 0, 899, 179), fill=(30, 12, 58))
+    draw.ellipse((330, 24, 570, 170), fill=(255, 94, 194), outline=(255, 196, 0))
+    for y in range(95, 170, 12):
+        draw.line((120, y, 780, y), fill=(50, 236, 255), width=2)
+    for x in range(180, 721, 45):
+        draw.line((450, 170, x, 95), fill=(50, 236, 255), width=1)
+    draw.text((248, 32), "SYNTHWAVE OUTRUN REPORT", fill=(241, 238, 255))
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (20, 8, 40))
+    draw = ImageDraw.Draw(side)
+    for y in range(20, 240, 20):
+        draw.line((15, y, 165, y), fill=(50, 236, 255), width=1)
+    for x in range(20, 160, 20):
+        draw.line((x, 20, x, 240), fill=(255, 94, 194), width=1)
+    draw.rectangle((30, 42, 150, 90), outline=(255, 196, 0), width=3)
+    draw.text((51, 57), "SUNSET", fill=(255, 196, 0))
+    draw.rectangle((30, 146, 150, 194), outline=(50, 236, 255), width=3)
+    draw.text((58, 161), "GRID", fill=(50, 236, 255))
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (20, 8, 40))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((8, 8, 412, 112), outline=(255, 196, 0), width=3)
+    draw.text((35, 24), "OUTRUN SYSTEM CHECK", fill=(241, 238, 255))
+    draw.text((55, 68), "HORIZON LOCK ENGAGED", fill=(50, 236, 255))
+    compat.save(compat_art_path)
+
+    return {"banner": banner_path, "side": side_art_path, "compat": compat_art_path}
+
+
+def create_brutalist_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "brutalist_banner.bmp"
+    side_art_path = asset_dir / "brutalist_side.bmp"
+    compat_art_path = asset_dir / "brutalist_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (255, 255, 255))
+    draw = ImageDraw.Draw(banner)
+    draw.rectangle((0, 0, 899, 45), fill=(0, 0, 0))
+    draw.rectangle((0, 135, 899, 179), fill=(0, 0, 0))
+    draw.rectangle((40, 55, 220, 125), fill=(0, 0, 0))
+    draw.rectangle((260, 55, 860, 125), outline=(0, 0, 0), width=4)
+    draw.text((280, 76), "BRUTALIST MONOCHROME REPORT", fill=(0, 0, 0))
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (255, 255, 255))
+    draw = ImageDraw.Draw(side)
+    draw.rectangle((15, 15, 165, 245), outline=(0, 0, 0), width=4)
+    draw.rectangle((30, 30, 150, 70), fill=(0, 0, 0))
+    draw.rectangle((30, 90, 90, 150), fill=(0, 0, 0))
+    draw.rectangle((105, 90, 150, 150), outline=(0, 0, 0), width=3)
+    draw.rectangle((30, 170, 150, 215), outline=(0, 0, 0), width=3)
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (255, 255, 255))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((8, 8, 412, 112), outline=(0, 0, 0), width=4)
+    draw.rectangle((20, 20, 140, 96), fill=(0, 0, 0))
+    draw.text((165, 38), "MONO COMPATIBILITY", fill=(0, 0, 0))
+    draw.text((165, 70), "STRUCTURE VERIFIED", fill=(0, 0, 0))
+    compat.save(compat_art_path)
+
+    return {"banner": banner_path, "side": side_art_path, "compat": compat_art_path}
+
+
 def create_theme_assets(asset_dir: Path, theme: ThemeProfile) -> dict[str, Path] | None:
     if theme.name == "star-wars":
         return create_star_wars_assets(asset_dir)
@@ -1467,6 +2066,14 @@ def create_theme_assets(asset_dir: Path, theme: ThemeProfile) -> dict[str, Path]
         return create_cyberpunk_assets(asset_dir)
     if theme.name == "high-contrast":
         return create_high_contrast_assets(asset_dir)
+    if theme.name == "medieval-manuscript":
+        return create_medieval_assets(asset_dir)
+    if theme.name == "fantasy-forest-map":
+        return create_treasure_map_assets(asset_dir)
+    if theme.name == "synthwave-outrun":
+        return create_outrun_assets(asset_dir)
+    if theme.name == "brutalist-monochrome":
+        return create_brutalist_assets(asset_dir)
     return None
 
 
