@@ -59,6 +59,50 @@ CORPORATE_OLD_SCHOOL_PALETTE = {
     "stone": (0x28, (166, 166, 166)),
 }
 
+RETRO_90S_PALETTE = {
+    "navy": (0x21, (0, 0, 128)),
+    "slate": (0x22, (0, 128, 128)),
+    "mist": (0x23, (192, 192, 192)),
+    "ivory": (0x24, (236, 233, 216)),
+    "gold": (0x25, (255, 255, 0)),
+    "coral": (0x26, (0, 255, 255)),
+    "sage": (0x27, (0, 0, 0)),
+    "stone": (0x28, (128, 128, 128)),
+}
+
+VEGAS_CASINO_PALETTE = {
+    "navy": (0x21, (46, 0, 74)),
+    "slate": (0x22, (124, 0, 145)),
+    "mist": (0x23, (255, 230, 250)),
+    "ivory": (0x24, (36, 0, 46)),
+    "gold": (0x25, (255, 215, 0)),
+    "coral": (0x26, (255, 20, 147)),
+    "sage": (0x27, (255, 255, 255)),
+    "stone": (0x28, (255, 105, 180)),
+}
+
+CYBERPUNK_PALETTE = {
+    "navy": (0x21, (10, 10, 28)),
+    "slate": (0x22, (36, 14, 76)),
+    "mist": (0x23, (17, 245, 255)),
+    "ivory": (0x24, (24, 12, 38)),
+    "gold": (0x25, (255, 0, 153)),
+    "coral": (0x26, (255, 255, 0)),
+    "sage": (0x27, (240, 240, 240)),
+    "stone": (0x28, (120, 75, 220)),
+}
+
+HIGH_CONTRAST_PALETTE = {
+    "navy": (0x21, (0, 0, 0)),
+    "slate": (0x22, (255, 255, 255)),
+    "mist": (0x23, (255, 255, 0)),
+    "ivory": (0x24, (255, 255, 255)),
+    "gold": (0x25, (255, 0, 0)),
+    "coral": (0x26, (0, 255, 255)),
+    "sage": (0x27, (0, 0, 0)),
+    "stone": (0x28, (0, 0, 0)),
+}
+
 STAR_WARS_PALETTE = {
     "navy": (0x21, (12, 12, 32)),
     "slate": (0x22, (33, 33, 74)),
@@ -101,6 +145,34 @@ THEMES = {
         palette=CORPORATE_OLD_SCHOOL_PALETTE,
         title_font_name="Arial",
         heading_font_name="Arial",
+        body_font_name="Arial",
+    ),
+    "retro-90s": ThemeProfile(
+        name="retro-90s",
+        palette=RETRO_90S_PALETTE,
+        title_font_name="Arial",
+        heading_font_name="Arial",
+        body_font_name="Arial",
+    ),
+    "vegas-casino": ThemeProfile(
+        name="vegas-casino",
+        palette=VEGAS_CASINO_PALETTE,
+        title_font_name="Arial Black",
+        heading_font_name="Arial Black",
+        body_font_name="Arial",
+    ),
+    "cyberpunk": ThemeProfile(
+        name="cyberpunk",
+        palette=CYBERPUNK_PALETTE,
+        title_font_name="Arial Black",
+        heading_font_name="Arial Black",
+        body_font_name="Arial",
+    ),
+    "high-contrast": ThemeProfile(
+        name="high-contrast",
+        palette=HIGH_CONTRAST_PALETTE,
+        title_font_name="Arial Black",
+        heading_font_name="Arial Black",
         body_font_name="Arial",
     ),
     "star-wars": ThemeProfile(
@@ -292,6 +364,10 @@ def style_spec_for_cell(
     is_clancy_light = theme.name == "clancy-light"
     is_oldschool = theme.name == "corporate-oldschool"
     is_star_wars = theme.name == "star-wars"
+    is_windows_90s = theme.name == "retro-90s"
+    is_vegas = theme.name == "vegas-casino"
+    is_cyberpunk = theme.name == "cyberpunk"
+    is_high_contrast = theme.name == "high-contrast"
     is_clancy = is_clancy_dark or is_clancy_light
     title_font = theme.title_font_name
     heading_font = theme.heading_font_name
@@ -303,7 +379,7 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "black",
+            font_colour="mist" if is_star_wars else "mist" if is_cyberpunk else "gold" if is_vegas else "black" if is_high_contrast else "sage" if (is_clancy or is_oldschool) else "black",
             border_colour="stone",
             left=0,
             right=0,
@@ -314,6 +390,66 @@ def style_spec_for_cell(
         )
 
     if role == "title":
+        if is_windows_90s:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=300,
+                bold=True,
+                font_colour="white",
+                bg_colour="navy",
+                border_colour="stone",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
+        if is_vegas:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=340,
+                bold=True,
+                font_colour="gold",
+                bg_colour="navy",
+                border_colour="coral",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
+        if is_cyberpunk:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=340,
+                bold=True,
+                font_colour="coral",
+                bg_colour="navy",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
+        if is_high_contrast:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=320,
+                bold=True,
+                font_colour="white",
+                bg_colour="black",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
         if is_star_wars:
             return ThemeStyle(
                 font_name=title_font,
@@ -375,6 +511,104 @@ def style_spec_for_cell(
         )
 
     if role == "section_header":
+        if is_windows_90s and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="white",
+                bg_colour="slate",
+                border_colour="stone",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_windows_90s:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="mist",
+                border_colour="stone",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_vegas and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="gold",
+                border_colour="coral",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_vegas:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="gold",
+                bg_colour="slate",
+                border_colour="coral",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_cyberpunk and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="gold",
+                border_colour="coral",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_cyberpunk:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="coral",
+                bg_colour="slate",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_high_contrast:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="white" if str(value).strip().upper() != "TOTAL" else "black",
+                bg_colour="black" if str(value).strip().upper() != "TOTAL" else "gold",
+                border_colour="gold",
+                left=2,
+                right=2,
+                top=2,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
         if is_star_wars and str(value).strip().upper() == "TOTAL":
             return ThemeStyle(
                 font_name=heading_font,
@@ -474,7 +708,19 @@ def style_spec_for_cell(
         )
 
     if role == "total_sent":
-        if is_star_wars:
+        if is_windows_90s:
+            bg_colour = "slate"
+            font_colour = "white"
+        elif is_vegas:
+            bg_colour = "gold"
+            font_colour = "navy"
+        elif is_cyberpunk:
+            bg_colour = "coral"
+            font_colour = "navy"
+        elif is_high_contrast:
+            bg_colour = "gold"
+            font_colour = "black"
+        elif is_star_wars:
             bg_colour = "slate"
             font_colour = "gold"
         elif is_oldschool:
@@ -490,7 +736,19 @@ def style_spec_for_cell(
             bg_colour = "mist"
             font_colour = "navy"
     elif role == "total_rec":
-        if is_star_wars:
+        if is_windows_90s:
+            bg_colour = "mist"
+            font_colour = "navy"
+        elif is_vegas:
+            bg_colour = "coral"
+            font_colour = "navy"
+        elif is_cyberpunk:
+            bg_colour = "gold"
+            font_colour = "navy"
+        elif is_high_contrast:
+            bg_colour = "black"
+            font_colour = "white"
+        elif is_star_wars:
             bg_colour = "coral"
             font_colour = "navy"
         elif is_oldschool:
@@ -506,7 +764,19 @@ def style_spec_for_cell(
             bg_colour = "ivory"
             font_colour = "navy"
     elif role == "not_found":
-        if is_star_wars:
+        if is_windows_90s:
+            bg_colour = "gold"
+            font_colour = "navy"
+        elif is_vegas:
+            bg_colour = "mist"
+            font_colour = "navy"
+        elif is_cyberpunk:
+            bg_colour = "slate"
+            font_colour = "coral"
+        elif is_high_contrast:
+            bg_colour = "white"
+            font_colour = "black"
+        elif is_star_wars:
             bg_colour = "gold"
             font_colour = "navy"
         elif is_oldschool:
@@ -528,12 +798,12 @@ def style_spec_for_cell(
     if role in {"total_sent", "total_rec", "not_found"}:
         if colx == 0:
             return ThemeStyle(
-                font_name=heading_font if (is_clancy or is_oldschool or is_star_wars) else body_font,
+                font_name=heading_font if (is_clancy or is_oldschool or is_star_wars or is_windows_90s or is_vegas or is_cyberpunk or is_high_contrast) else body_font,
                 font_height=220,
                 bold=True,
                 font_colour=font_colour,
                 bg_colour=bg_colour,
-                border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "slate",
+                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
                 left=1,
                 right=1,
                 top=1,
@@ -541,12 +811,12 @@ def style_spec_for_cell(
                 horz=xlwt.Alignment.HORZ_RIGHT,
             )
         return ThemeStyle(
-            font_name=heading_font if (is_clancy or is_oldschool or is_star_wars) else body_font,
+            font_name=heading_font if (is_clancy or is_oldschool or is_star_wars or is_windows_90s or is_vegas or is_cyberpunk or is_high_contrast) else body_font,
             font_height=220,
             bold=True,
             font_colour=font_colour,
             bg_colour=bg_colour,
-            border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "slate",
+            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
             left=1,
             right=1,
             top=1,
@@ -558,9 +828,9 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             bold=colx == 7,
-            font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "navy",
-            bg_colour="slate" if is_star_wars else "ivory" if is_oldschool else "mist" if is_clancy_dark else "ivory" if is_clancy_light else "ivory",
-            border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "slate",
+            font_colour="white" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool) else "navy",
+            bg_colour="black" if is_high_contrast else "slate" if is_star_wars else "navy" if is_vegas else "slate" if is_cyberpunk else "ivory" if is_oldschool else "mist" if is_clancy_dark else "ivory" if is_clancy_light else "ivory",
+            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
             left=1,
             right=1,
             top=1,
@@ -569,7 +839,15 @@ def style_spec_for_cell(
         )
 
     if role in {"sent", "received", "body"}:
-        if is_star_wars:
+        if is_high_contrast:
+            bg_colour = "black" if role == "received" else "white" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_vegas:
+            bg_colour = "coral" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_cyberpunk:
+            bg_colour = "slate" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_windows_90s:
+            bg_colour = "mist" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_star_wars:
             bg_colour = "slate" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
         elif is_oldschool:
             bg_colour = "coral" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
@@ -582,9 +860,9 @@ def style_spec_for_cell(
         spec = ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
+            font_colour="white" if is_high_contrast and role != "body" else "black" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
             bg_colour=bg_colour,
-            border_colour="coral" if is_star_wars and colx <= MAIN_TABLE_LAST_COL else "stone",
+            border_colour="gold" if is_high_contrast and colx <= MAIN_TABLE_LAST_COL else "gold" if is_cyberpunk and colx <= MAIN_TABLE_LAST_COL else "coral" if (is_star_wars or is_vegas) and colx <= MAIN_TABLE_LAST_COL else "stone",
             horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
             bold=colx == 7 and sheet_name != "Compatibility Report",
         )
@@ -593,9 +871,9 @@ def style_spec_for_cell(
                 font_name=body_font,
                 font_height=200,
                 bold=True,
-                font_colour="gold" if is_star_wars else "navy" if is_oldschool else "gold" if is_clancy else "navy",
+                font_colour="black" if is_high_contrast else "gold" if is_star_wars else "navy" if is_oldschool else "gold" if (is_clancy or is_vegas or is_cyberpunk) else "navy",
                 bg_colour=bg_colour,
-                border_colour="coral" if is_star_wars else "stone",
+                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if colx == 7 and sheet_name != "Compatibility Report":
@@ -603,32 +881,72 @@ def style_spec_for_cell(
                 font_name=body_font,
                 font_height=200,
                 bold=True,
-                font_colour="navy" if (is_oldschool or is_star_wars) else "white" if is_clancy else "navy",
-                bg_colour="gold" if (is_clancy or is_oldschool or is_star_wars) else None,
-                border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "stone",
+                font_colour="black" if is_high_contrast else "navy" if (is_oldschool or is_star_wars or is_vegas or is_cyberpunk) else "white" if is_clancy else "navy",
+                bg_colour="gold" if (is_clancy or is_oldschool or is_star_wars or is_vegas or is_cyberpunk or is_high_contrast) else None,
+                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone" if is_oldschool else "gold" if is_clancy else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if "%" in fmt or colx >= 8:
             return ThemeStyle(
                 font_name=body_font,
                 font_height=200,
-                font_colour="coral" if is_star_wars else "sage" if is_oldschool else "slate" if is_clancy else "navy",
-                bg_colour="ivory" if (is_clancy or is_oldschool or is_star_wars) and colx <= MAIN_TABLE_LAST_COL else None,
-                border_colour="coral" if is_star_wars and colx <= MAIN_TABLE_LAST_COL else "stone",
+                font_colour="black" if is_high_contrast else "coral" if is_star_wars else "gold" if is_vegas else "coral" if is_cyberpunk else "sage" if is_oldschool else "slate" if is_clancy else "navy",
+                bg_colour="white" if is_high_contrast and colx <= MAIN_TABLE_LAST_COL else "ivory" if (is_clancy or is_oldschool or is_star_wars or is_vegas or is_cyberpunk) and colx <= MAIN_TABLE_LAST_COL else None,
+                border_colour="gold" if is_high_contrast and colx <= MAIN_TABLE_LAST_COL else "gold" if is_cyberpunk and colx <= MAIN_TABLE_LAST_COL else "coral" if (is_star_wars or is_vegas) and colx <= MAIN_TABLE_LAST_COL else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if colx >= 2:
             return ThemeStyle(
                 font_name=body_font,
                 font_height=200,
-                font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
+                font_colour="black" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
                 bg_colour=bg_colour,
-                border_colour="coral" if is_star_wars else "stone",
+                border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         return spec
 
     if role == "compat_title":
+        if is_high_contrast:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="white",
+                bg_colour="black",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_cyberpunk:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="coral",
+                bg_colour="navy",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_vegas:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="gold",
+                bg_colour="navy",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_windows_90s:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="white",
+                bg_colour="navy",
+                border_colour="stone",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
         if is_star_wars:
             return ThemeStyle(
                 font_name=title_font,
@@ -670,6 +988,46 @@ def style_spec_for_cell(
         )
 
     if role == "compat_header":
+        if is_high_contrast:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="black",
+                bg_colour="gold",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_cyberpunk:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="gold",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_vegas:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="gold",
+                bg_colour="slate",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
+        if is_windows_90s:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="mist",
+                border_colour="stone",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
         if is_star_wars:
             return ThemeStyle(
                 font_name=heading_font,
@@ -714,9 +1072,9 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="mist" if is_star_wars else "black",
-            bg_colour="slate" if is_star_wars else "ivory" if is_oldschool else "mist",
-            border_colour="coral" if is_star_wars else "stone",
+            font_colour="white" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "mist" if is_cyberpunk else "black",
+            bg_colour="black" if is_high_contrast else "slate" if is_star_wars else "navy" if is_vegas else "slate" if is_cyberpunk else "ivory" if is_oldschool else "mist",
+            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
             horz=xlwt.Alignment.HORZ_LEFT,
         )
 
@@ -724,9 +1082,9 @@ def style_spec_for_cell(
         return centered_right if colx == 4 else centered if colx == 5 else ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="mist" if is_star_wars else "black",
-            bg_colour="ivory" if is_star_wars else "mist" if is_oldschool else "ivory",
-            border_colour="coral" if is_star_wars else "stone",
+            font_colour="black" if is_high_contrast else "mist" if is_star_wars else "gold" if is_vegas else "coral" if is_cyberpunk else "black",
+            bg_colour="white" if is_high_contrast else "ivory" if (is_star_wars or is_vegas or is_cyberpunk) else "mist" if is_oldschool else "ivory",
+            border_colour="gold" if is_high_contrast else "gold" if is_cyberpunk else "coral" if (is_star_wars or is_vegas) else "stone",
         )
 
     return ThemeStyle()
@@ -798,30 +1156,102 @@ def themed_cell_value(
     cell: xlrd.sheet.Cell,
 ) -> object:
     value = output_cell_value(sheet_name, output_filename, rowx, colx, cell)
-    if theme.name != "star-wars" or not isinstance(value, str):
+    if not isinstance(value, str):
         return value
 
-    if sheet_name == "Current" and rowx == 1 and colx == 0:
-        return "GALACTIC DMV HOLOCRON - APRIL 2025"
-    if sheet_name == "Template" and rowx == 6 and colx == 0:
-        return "GALACTIC DMV HOLOCRON TEMPLATE"
-    if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
-        return f"JEDI ARCHIVE COMPATIBILITY REPORT - {output_filename}"
+    if theme.name == "star-wars":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "GALACTIC DMV HOLOCRON - APRIL 2025"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "GALACTIC DMV HOLOCRON TEMPLATE"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"JEDI ARCHIVE COMPATIBILITY REPORT - {output_filename}"
+        replacements = {
+            "Other States": "Outer Rim Systems",
+            "Other States-POLK": "Outer Rim Systems - POLK SECTOR",
+            "Colorado DMV ": "Coruscant DMV",
+            "TOTAL": "GALACTIC TOTAL",
+            "Total Sent:": "Transmissions Sent:",
+            "Total Rec:": "Signals Received:",
+            "Not Found:": "Lost in Hyperspace:",
+            "Sent": "Dispatched",
+            "Rec'd": "Received",
+            "Compatibility Report": "Jedi Archive Report",
+            "Minor loss of fidelity": "Minor disturbance in the Force",
+        }
+        return replacements.get(value, value)
+    if theme.name == "retro-90s":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "Monthly Report - Windows 95 Edition"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "Template - Windows 95 Edition"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"System Compatibility Check - {output_filename}"
+        replacements = {
+            "TOTAL": "TOTAL.EXE",
+            "Total Sent:": "Packets Sent:",
+            "Total Rec:": "Packets Received:",
+            "Not Found:": "Missing Files:",
+            "Minor loss of fidelity": "Display driver warning",
+        }
+        return replacements.get(value, value)
+    if theme.name == "vegas-casino":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "THE GOLDMAN GRAND - HIGH ROLLER REPORT"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "THE GOLDMAN GRAND - TABLE TEMPLATE"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"Casino Floor Compatibility Report - {output_filename}"
+        replacements = {
+            "Other States": "High Roller Tables",
+            "Other States-POLK": "High Roller Tables - Polk Pit",
+            "Colorado DMV ": "Main Casino Floor",
+            "TOTAL": "JACKPOT TOTAL",
+            "Total Sent:": "Chips In Play:",
+            "Total Rec:": "Chips Returned:",
+            "Not Found:": "House Losses:",
+            "Sent": "Wagered",
+            "Rec'd": "Paid",
+            "Minor loss of fidelity": "Minor lighting loss",
+        }
+        return replacements.get(value, value)
+    if theme.name == "cyberpunk":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "NEON GRID OPERATIONS // APRIL 2025"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "NEON GRID TEMPLATE // CONTROL PANEL"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"Neon Grid Diagnostics - {output_filename}"
+        replacements = {
+            "Other States": "Night City Sectors",
+            "Other States-POLK": "Night City Sectors - Polk Node",
+            "Colorado DMV ": "Central Neon District",
+            "TOTAL": "NET TOTAL",
+            "Total Sent:": "Signals Pushed:",
+            "Total Rec:": "Signals Synced:",
+            "Not Found:": "Ghost Packets:",
+            "Sent": "Uploaded",
+            "Rec'd": "Synced",
+            "Minor loss of fidelity": "Signal degradation detected",
+        }
+        return replacements.get(value, value)
+    if theme.name == "high-contrast":
+        if sheet_name == "Current" and rowx == 1 and colx == 0:
+            return "HIGH CONTRAST REPORT - APRIL 2025"
+        if sheet_name == "Template" and rowx == 6 and colx == 0:
+            return "HIGH CONTRAST TEMPLATE"
+        if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+            return f"High Contrast Accessibility Report - {output_filename}"
+        replacements = {
+            "TOTAL": "TOTAL",
+            "Total Sent:": "TOTAL SENT:",
+            "Total Rec:": "TOTAL RECEIVED:",
+            "Not Found:": "NOT FOUND:",
+            "Minor loss of fidelity": "Accessibility contrast warning",
+        }
+        return replacements.get(value, value)
 
-    replacements = {
-        "Other States": "Outer Rim Systems",
-        "Other States-POLK": "Outer Rim Systems - POLK SECTOR",
-        "Colorado DMV ": "Coruscant DMV",
-        "TOTAL": "GALACTIC TOTAL",
-        "Total Sent:": "Transmissions Sent:",
-        "Total Rec:": "Signals Received:",
-        "Not Found:": "Lost in Hyperspace:",
-        "Sent": "Dispatched",
-        "Rec'd": "Received",
-        "Compatibility Report": "Jedi Archive Report",
-        "Minor loss of fidelity": "Minor disturbance in the Force",
-    }
-    return replacements.get(value, value)
+    return value
 
 
 def create_star_wars_assets(asset_dir: Path) -> dict[str, Path]:
@@ -874,17 +1304,184 @@ def create_star_wars_assets(asset_dir: Path) -> dict[str, Path]:
     }
 
 
+def create_windows_90s_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "windows_90s_banner.bmp"
+    side_art_path = asset_dir / "windows_90s_side.bmp"
+    compat_art_path = asset_dir / "windows_90s_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (192, 192, 192))
+    draw = ImageDraw.Draw(banner)
+    draw.rectangle((0, 0, 899, 30), fill=(0, 0, 128))
+    draw.rectangle((8, 42, 892, 168), fill=(236, 233, 216), outline=(128, 128, 128), width=3)
+    draw.rectangle((16, 50, 884, 70), fill=(0, 128, 128))
+    draw.text((30, 8), "Galactic Report Manager", fill=(255, 255, 255))
+    draw.text((40, 88), "RETRO 90s WINDOWS COMMAND CENTER", fill=(0, 0, 0))
+    draw.rectangle((40, 115, 160, 145), fill=(192, 192, 192), outline=(0, 0, 0), width=1)
+    draw.text((70, 123), "OK", fill=(0, 0, 0))
+    draw.rectangle((185, 115, 305, 145), fill=(192, 192, 192), outline=(0, 0, 0), width=1)
+    draw.text((202, 123), "CANCEL", fill=(0, 0, 0))
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (236, 233, 216))
+    draw = ImageDraw.Draw(side)
+    draw.rectangle((12, 12, 168, 248), outline=(128, 128, 128), width=3)
+    draw.rectangle((18, 18, 162, 44), fill=(0, 0, 128))
+    draw.text((30, 24), "Control Panel", fill=(255, 255, 255))
+    draw.rectangle((28, 70, 150, 95), fill=(192, 192, 192), outline=(0, 0, 0))
+    draw.text((40, 76), "Spreadsheet", fill=(0, 0, 0))
+    draw.rectangle((28, 110, 150, 135), fill=(192, 192, 192), outline=(0, 0, 0))
+    draw.text((55, 116), "Inbox", fill=(0, 0, 0))
+    draw.rectangle((28, 150, 150, 175), fill=(192, 192, 192), outline=(0, 0, 0))
+    draw.text((57, 156), "Start", fill=(0, 0, 0))
+    draw.rectangle((20, 222, 160, 240), fill=(0, 128, 128))
+    draw.text((35, 226), "Ready", fill=(255, 255, 255))
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (236, 233, 216))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((0, 0, 419, 26), fill=(0, 0, 128))
+    draw.text((15, 7), "Compatibility Wizard", fill=(255, 255, 255))
+    draw.text((18, 45), "Your workbook completed successfully.", fill=(0, 0, 0))
+    draw.text((18, 72), "Press Finish to continue.", fill=(0, 0, 0))
+    draw.rectangle((300, 86, 385, 108), fill=(192, 192, 192), outline=(0, 0, 0))
+    draw.text((320, 91), "Finish", fill=(0, 0, 0))
+    compat.save(compat_art_path)
+
+    return {
+        "banner": banner_path,
+        "side": side_art_path,
+        "compat": compat_art_path,
+    }
+
+
+def create_vegas_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "vegas_banner.bmp"
+    side_art_path = asset_dir / "vegas_side.bmp"
+    compat_art_path = asset_dir / "vegas_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (35, 0, 45))
+    draw = ImageDraw.Draw(banner)
+    for x in range(0, 900, 25):
+        draw.ellipse((x + 5, 10, x + 12, 17), fill=(255, 215, 0))
+    draw.rectangle((30, 35, 870, 150), outline=(255, 215, 0), width=5)
+    draw.text((260, 55), "VEGAS CASINO REPORT", fill=(255, 215, 0))
+    draw.text((175, 100), "JACKPOT METRICS - ALL TABLES HOT", fill=(255, 80, 160))
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (50, 0, 50))
+    draw = ImageDraw.Draw(side)
+    for y in range(20, 240, 28):
+        draw.rectangle((20, y, 160, y + 18), fill=(255, 215, 0))
+    draw.text((50, 26), "777", fill=(50, 0, 50))
+    draw.text((46, 82), "BAR", fill=(50, 0, 50))
+    draw.text((38, 138), "SPIN", fill=(50, 0, 50))
+    draw.text((37, 194), "WIN!", fill=(50, 0, 50))
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (50, 0, 50))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((10, 10, 410, 110), outline=(255, 215, 0), width=4)
+    draw.text((35, 24), "CASINO FLOOR COMPATIBILITY", fill=(255, 215, 0))
+    draw.text((55, 64), "HOUSE RULES APPLIED", fill=(255, 80, 160))
+    compat.save(compat_art_path)
+
+    return {
+        "banner": banner_path,
+        "side": side_art_path,
+        "compat": compat_art_path,
+    }
+
+
+def create_cyberpunk_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "cyberpunk_banner.bmp"
+    side_art_path = asset_dir / "cyberpunk_side.bmp"
+    compat_art_path = asset_dir / "cyberpunk_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (18, 10, 36))
+    draw = ImageDraw.Draw(banner)
+    for x in range(0, 900, 40):
+        draw.line((x, 0, x + 80, 180), fill=(255, 0, 180), width=2)
+    draw.rectangle((20, 25, 880, 155), outline=(0, 255, 255), width=4)
+    draw.text((250, 55), "CYBERPUNK GRID REPORT", fill=(0, 255, 255))
+    draw.text((210, 100), "NEON SIGNALS // NIGHT CITY METRICS", fill=(255, 0, 180))
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (10, 10, 20))
+    draw = ImageDraw.Draw(side)
+    for y in range(15, 250, 24):
+        draw.line((15, y, 165, y), fill=(0, 255, 255), width=1)
+    for x in range(15, 165, 24):
+        draw.line((x, 15, x, 245), fill=(255, 0, 180), width=1)
+    draw.rectangle((35, 40, 145, 90), outline=(255, 255, 0), width=3)
+    draw.text((58, 58), "NEXUS", fill=(255, 255, 0))
+    draw.rectangle((35, 130, 145, 180), outline=(0, 255, 255), width=3)
+    draw.text((52, 148), "GRID", fill=(0, 255, 255))
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (10, 10, 20))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((0, 0, 419, 119), outline=(0, 255, 255), width=3)
+    draw.text((30, 24), "CYBERPUNK SYSTEM CHECK", fill=(0, 255, 255))
+    draw.text((55, 64), "NEON STACK ONLINE", fill=(255, 0, 180))
+    compat.save(compat_art_path)
+
+    return {
+        "banner": banner_path,
+        "side": side_art_path,
+        "compat": compat_art_path,
+    }
+
+
+def create_high_contrast_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "high_contrast_banner.bmp"
+    compat_art_path = asset_dir / "high_contrast_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (0, 0, 0))
+    draw = ImageDraw.Draw(banner)
+    draw.rectangle((20, 20, 880, 160), outline=(255, 255, 0), width=5)
+    draw.text((180, 55), "HIGH CONTRAST COMMAND REPORT", fill=(255, 255, 255))
+    draw.text((260, 100), "MAXIMUM LEGIBILITY MODE", fill=(255, 255, 0))
+    banner.save(banner_path)
+
+    compat = Image.new("RGB", (420, 120), (0, 0, 0))
+    draw = ImageDraw.Draw(compat)
+    draw.rectangle((8, 8, 412, 112), outline=(255, 255, 255), width=3)
+    draw.text((18, 26), "ACCESSIBILITY COMPATIBILITY", fill=(255, 255, 0))
+    draw.text((38, 66), "HIGH VISIBILITY ENABLED", fill=(255, 255, 255))
+    compat.save(compat_art_path)
+
+    return {
+        "banner": banner_path,
+        "compat": compat_art_path,
+    }
+
+
+def create_theme_assets(asset_dir: Path, theme: ThemeProfile) -> dict[str, Path] | None:
+    if theme.name == "star-wars":
+        return create_star_wars_assets(asset_dir)
+    if theme.name == "retro-90s":
+        return create_windows_90s_assets(asset_dir)
+    if theme.name == "vegas-casino":
+        return create_vegas_assets(asset_dir)
+    if theme.name == "cyberpunk":
+        return create_cyberpunk_assets(asset_dir)
+    if theme.name == "high-contrast":
+        return create_high_contrast_assets(asset_dir)
+    return None
+
+
 def apply_theme_art(
     worksheet: xlwt.Worksheet,
     sheet_name: str,
     theme: ThemeProfile,
     assets: dict[str, Path] | None,
 ) -> None:
-    if theme.name != "star-wars" or not assets:
+    if not assets:
         return
     if sheet_name == "Current":
         worksheet.insert_bitmap(str(assets["banner"]), 0, 0, scale_x=0.72, scale_y=0.72)
-        worksheet.insert_bitmap(str(assets["side"]), 71, 9, scale_x=0.55, scale_y=0.55)
+        if "side" in assets:
+            worksheet.insert_bitmap(str(assets["side"]), 71, 9, scale_x=0.55, scale_y=0.55)
     elif sheet_name == "Template":
         worksheet.insert_bitmap(str(assets["banner"]), 0, 0, scale_x=0.72, scale_y=0.72)
     elif sheet_name == "Compatibility Report":
@@ -967,7 +1564,7 @@ def build_workbook(input_path: str, output_path: str, theme_name: str = "classic
     configure_palette(target_book, theme.palette)
     target_book._style_factory = StyleFactory(target_book, theme.palette)  # type: ignore[attr-defined]
     with TemporaryDirectory() as tmpdir:
-        assets = create_star_wars_assets(Path(tmpdir)) if theme.name == "star-wars" else None
+        assets = create_theme_assets(Path(tmpdir), theme)
         for sheet_name in source_book.sheet_names():
             restyle_sheet(source_book, target_book, sheet_name, theme, output_filename, assets)
         target_book.save(output_path)
