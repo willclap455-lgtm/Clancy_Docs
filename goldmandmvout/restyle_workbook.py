@@ -3,9 +3,11 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import xlrd
 import xlwt
+from PIL import Image, ImageDraw
 
 
 MAIN_TABLE_LAST_COL = 8
@@ -57,6 +59,17 @@ CORPORATE_OLD_SCHOOL_PALETTE = {
     "stone": (0x28, (166, 166, 166)),
 }
 
+STAR_WARS_PALETTE = {
+    "navy": (0x21, (12, 12, 32)),
+    "slate": (0x22, (33, 33, 74)),
+    "mist": (0x23, (255, 232, 110)),
+    "ivory": (0x24, (20, 20, 20)),
+    "gold": (0x25, (255, 214, 10)),
+    "coral": (0x26, (83, 210, 255)),
+    "sage": (0x27, (214, 214, 214)),
+    "stone": (0x28, (90, 90, 120)),
+}
+
 
 @dataclass(frozen=True)
 class ThemeProfile:
@@ -88,6 +101,13 @@ THEMES = {
         palette=CORPORATE_OLD_SCHOOL_PALETTE,
         title_font_name="Arial",
         heading_font_name="Arial",
+        body_font_name="Arial",
+    ),
+    "star-wars": ThemeProfile(
+        name="star-wars",
+        palette=STAR_WARS_PALETTE,
+        title_font_name="Arial Black",
+        heading_font_name="Arial Black",
         body_font_name="Arial",
     ),
 }
@@ -271,6 +291,7 @@ def style_spec_for_cell(
     is_clancy_dark = theme.name == "clancy"
     is_clancy_light = theme.name == "clancy-light"
     is_oldschool = theme.name == "corporate-oldschool"
+    is_star_wars = theme.name == "star-wars"
     is_clancy = is_clancy_dark or is_clancy_light
     title_font = theme.title_font_name
     heading_font = theme.heading_font_name
@@ -282,7 +303,7 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="sage" if (is_clancy or is_oldschool) else "black",
+            font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "black",
             border_colour="stone",
             left=0,
             right=0,
@@ -293,6 +314,21 @@ def style_spec_for_cell(
         )
 
     if role == "title":
+        if is_star_wars:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=360,
+                bold=True,
+                font_colour="gold",
+                bg_colour="navy",
+                border_colour="coral",
+                left=0,
+                right=0,
+                top=0,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
         if is_oldschool:
             return ThemeStyle(
                 font_name=title_font,
@@ -339,6 +375,34 @@ def style_spec_for_cell(
         )
 
     if role == "section_header":
+        if is_star_wars and str(value).strip().upper() == "TOTAL":
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="gold",
+                border_colour="coral",
+                left=1,
+                right=1,
+                top=1,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+            )
+        if is_star_wars:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="gold",
+                bg_colour="slate",
+                border_colour="coral",
+                left=1,
+                right=1,
+                top=1,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
         if is_oldschool and str(value).strip().upper() == "TOTAL":
             return ThemeStyle(
                 font_name=heading_font,
@@ -410,7 +474,10 @@ def style_spec_for_cell(
         )
 
     if role == "total_sent":
-        if is_oldschool:
+        if is_star_wars:
+            bg_colour = "slate"
+            font_colour = "gold"
+        elif is_oldschool:
             bg_colour = "slate"
             font_colour = "white"
         elif is_clancy_dark:
@@ -423,7 +490,10 @@ def style_spec_for_cell(
             bg_colour = "mist"
             font_colour = "navy"
     elif role == "total_rec":
-        if is_oldschool:
+        if is_star_wars:
+            bg_colour = "coral"
+            font_colour = "navy"
+        elif is_oldschool:
             bg_colour = "mist"
             font_colour = "navy"
         elif is_clancy_dark:
@@ -436,7 +506,10 @@ def style_spec_for_cell(
             bg_colour = "ivory"
             font_colour = "navy"
     elif role == "not_found":
-        if is_oldschool:
+        if is_star_wars:
+            bg_colour = "gold"
+            font_colour = "navy"
+        elif is_oldschool:
             bg_colour = "coral"
             font_colour = "navy"
         elif is_clancy_dark:
@@ -455,12 +528,12 @@ def style_spec_for_cell(
     if role in {"total_sent", "total_rec", "not_found"}:
         if colx == 0:
             return ThemeStyle(
-                font_name=heading_font if (is_clancy or is_oldschool) else body_font,
+                font_name=heading_font if (is_clancy or is_oldschool or is_star_wars) else body_font,
                 font_height=220,
                 bold=True,
                 font_colour=font_colour,
                 bg_colour=bg_colour,
-                border_colour="stone" if is_oldschool else "gold" if is_clancy else "slate",
+                border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "slate",
                 left=1,
                 right=1,
                 top=1,
@@ -468,12 +541,12 @@ def style_spec_for_cell(
                 horz=xlwt.Alignment.HORZ_RIGHT,
             )
         return ThemeStyle(
-            font_name=heading_font if (is_clancy or is_oldschool) else body_font,
+            font_name=heading_font if (is_clancy or is_oldschool or is_star_wars) else body_font,
             font_height=220,
             bold=True,
             font_colour=font_colour,
             bg_colour=bg_colour,
-            border_colour="stone" if is_oldschool else "gold" if is_clancy else "slate",
+            border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "slate",
             left=1,
             right=1,
             top=1,
@@ -485,9 +558,9 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             bold=colx == 7,
-            font_colour="sage" if (is_clancy or is_oldschool) else "navy",
-            bg_colour="ivory" if is_oldschool else "mist" if is_clancy_dark else "ivory" if is_clancy_light else "ivory",
-            border_colour="stone" if is_oldschool else "gold" if is_clancy else "slate",
+            font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "navy",
+            bg_colour="slate" if is_star_wars else "ivory" if is_oldschool else "mist" if is_clancy_dark else "ivory" if is_clancy_light else "ivory",
+            border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "slate",
             left=1,
             right=1,
             top=1,
@@ -496,7 +569,9 @@ def style_spec_for_cell(
         )
 
     if role in {"sent", "received", "body"}:
-        if is_oldschool:
+        if is_star_wars:
+            bg_colour = "slate" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_oldschool:
             bg_colour = "coral" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
         elif is_clancy_dark:
             bg_colour = "mist" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
@@ -507,9 +582,9 @@ def style_spec_for_cell(
         spec = ThemeStyle(
             font_name=body_font,
             font_height=200,
-            font_colour="sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
+            font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
             bg_colour=bg_colour,
-            border_colour="stone",
+            border_colour="coral" if is_star_wars and colx <= MAIN_TABLE_LAST_COL else "stone",
             horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
             bold=colx == 7 and sheet_name != "Compatibility Report",
         )
@@ -518,9 +593,9 @@ def style_spec_for_cell(
                 font_name=body_font,
                 font_height=200,
                 bold=True,
-                font_colour="navy" if is_oldschool else "gold" if is_clancy else "navy",
+                font_colour="gold" if is_star_wars else "navy" if is_oldschool else "gold" if is_clancy else "navy",
                 bg_colour=bg_colour,
-                border_colour="stone",
+                border_colour="coral" if is_star_wars else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if colx == 7 and sheet_name != "Compatibility Report":
@@ -528,32 +603,42 @@ def style_spec_for_cell(
                 font_name=body_font,
                 font_height=200,
                 bold=True,
-                font_colour="navy" if is_oldschool else "white" if is_clancy else "navy",
-                bg_colour="gold" if (is_clancy or is_oldschool) else None,
-                border_colour="stone" if is_oldschool else "gold" if is_clancy else "stone",
+                font_colour="navy" if (is_oldschool or is_star_wars) else "white" if is_clancy else "navy",
+                bg_colour="gold" if (is_clancy or is_oldschool or is_star_wars) else None,
+                border_colour="coral" if is_star_wars else "stone" if is_oldschool else "gold" if is_clancy else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if "%" in fmt or colx >= 8:
             return ThemeStyle(
                 font_name=body_font,
                 font_height=200,
-                font_colour="sage" if is_oldschool else "slate" if is_clancy else "navy",
-                bg_colour="ivory" if (is_clancy or is_oldschool) and colx <= MAIN_TABLE_LAST_COL else None,
-                border_colour="stone",
+                font_colour="coral" if is_star_wars else "sage" if is_oldschool else "slate" if is_clancy else "navy",
+                bg_colour="ivory" if (is_clancy or is_oldschool or is_star_wars) and colx <= MAIN_TABLE_LAST_COL else None,
+                border_colour="coral" if is_star_wars and colx <= MAIN_TABLE_LAST_COL else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if colx >= 2:
             return ThemeStyle(
                 font_name=body_font,
                 font_height=200,
-                font_colour="sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
+                font_colour="mist" if is_star_wars else "sage" if (is_clancy or is_oldschool) else "navy" if role != "body" else "black",
                 bg_colour=bg_colour,
-                border_colour="stone",
+                border_colour="coral" if is_star_wars else "stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         return spec
 
     if role == "compat_title":
+        if is_star_wars:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="gold",
+                bg_colour="navy",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
         if is_oldschool:
             return ThemeStyle(
                 font_name=title_font,
@@ -585,6 +670,16 @@ def style_spec_for_cell(
         )
 
     if role == "compat_header":
+        if is_star_wars:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="gold",
+                border_colour="coral",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
         if is_oldschool:
             return ThemeStyle(
                 font_name=heading_font,
@@ -619,8 +714,9 @@ def style_spec_for_cell(
         return ThemeStyle(
             font_name=body_font,
             font_height=200,
-            bg_colour="ivory" if is_oldschool else "mist",
-            border_colour="stone",
+            font_colour="mist" if is_star_wars else "black",
+            bg_colour="slate" if is_star_wars else "ivory" if is_oldschool else "mist",
+            border_colour="coral" if is_star_wars else "stone",
             horz=xlwt.Alignment.HORZ_LEFT,
         )
 
@@ -628,8 +724,9 @@ def style_spec_for_cell(
         return centered_right if colx == 4 else centered if colx == 5 else ThemeStyle(
             font_name=body_font,
             font_height=200,
-            bg_colour="mist" if is_oldschool else "ivory",
-            border_colour="stone",
+            font_colour="mist" if is_star_wars else "black",
+            bg_colour="ivory" if is_star_wars else "mist" if is_oldschool else "ivory",
+            border_colour="coral" if is_star_wars else "stone",
         )
 
     return ThemeStyle()
@@ -692,12 +789,115 @@ def output_cell_value(sheet_name: str, output_filename: str, rowx: int, colx: in
     return cell.value
 
 
+def themed_cell_value(
+    theme: ThemeProfile,
+    sheet_name: str,
+    output_filename: str,
+    rowx: int,
+    colx: int,
+    cell: xlrd.sheet.Cell,
+) -> object:
+    value = output_cell_value(sheet_name, output_filename, rowx, colx, cell)
+    if theme.name != "star-wars" or not isinstance(value, str):
+        return value
+
+    if sheet_name == "Current" and rowx == 1 and colx == 0:
+        return "GALACTIC DMV HOLOCRON - APRIL 2025"
+    if sheet_name == "Template" and rowx == 6 and colx == 0:
+        return "GALACTIC DMV HOLOCRON TEMPLATE"
+    if sheet_name == "Compatibility Report" and rowx == 0 and colx == 1:
+        return f"JEDI ARCHIVE COMPATIBILITY REPORT - {output_filename}"
+
+    replacements = {
+        "Other States": "Outer Rim Systems",
+        "Other States-POLK": "Outer Rim Systems - POLK SECTOR",
+        "Colorado DMV ": "Coruscant DMV",
+        "TOTAL": "GALACTIC TOTAL",
+        "Total Sent:": "Transmissions Sent:",
+        "Total Rec:": "Signals Received:",
+        "Not Found:": "Lost in Hyperspace:",
+        "Sent": "Dispatched",
+        "Rec'd": "Received",
+        "Compatibility Report": "Jedi Archive Report",
+        "Minor loss of fidelity": "Minor disturbance in the Force",
+    }
+    return replacements.get(value, value)
+
+
+def create_star_wars_assets(asset_dir: Path) -> dict[str, Path]:
+    banner_path = asset_dir / "star_wars_banner.bmp"
+    side_art_path = asset_dir / "star_wars_side.bmp"
+    compat_art_path = asset_dir / "star_wars_compat.bmp"
+
+    banner = Image.new("RGB", (900, 180), (8, 8, 20))
+    draw = ImageDraw.Draw(banner)
+    for x in range(0, 900, 37):
+        for y in range((x * 7) % 23, 180, 29):
+            draw.ellipse((x, y, x + 2, y + 2), fill=(255, 255, 255))
+    draw.rectangle((0, 0, 899, 25), fill=(12, 12, 32))
+    draw.text((180, 25), "STAR WARS", fill=(255, 214, 10))
+    draw.text((85, 75), "GALACTIC DMV INTELLIGENCE REPORT", fill=(255, 214, 10))
+    draw.text((170, 120), "MAY THE FORMS BE WITH YOU", fill=(83, 210, 255))
+    draw.polygon([(15, 160), (60, 150), (35, 110)], fill=(83, 210, 255))
+    draw.polygon([(845, 15), (890, 25), (865, 65)], fill=(255, 214, 10))
+    banner.save(banner_path)
+
+    side = Image.new("RGB", (180, 260), (12, 12, 32))
+    draw = ImageDraw.Draw(side)
+    for x in range(0, 180, 20):
+        for y in range((x * 5) % 13, 260, 21):
+            draw.point((x, y), fill=(255, 255, 255))
+    draw.rectangle((25, 20, 155, 50), outline=(255, 214, 10), width=3)
+    draw.text((40, 26), "REBELS", fill=(255, 214, 10))
+    draw.rectangle((30, 85, 150, 125), outline=(83, 210, 255), width=3)
+    draw.text((44, 95), "EMPIRE", fill=(83, 210, 255))
+    draw.line((30, 180, 150, 180), fill=(255, 0, 0), width=4)
+    draw.line((90, 150, 90, 210), fill=(83, 210, 255), width=4)
+    draw.ellipse((60, 215, 120, 255), outline=(255, 214, 10), width=3)
+    draw.text((69, 228), "R2", fill=(255, 214, 10))
+    side.save(side_art_path)
+
+    compat = Image.new("RGB", (420, 120), (12, 12, 32))
+    draw = ImageDraw.Draw(compat)
+    for x in range(0, 420, 25):
+        for y in range((x * 3) % 17, 120, 23):
+            draw.point((x, y), fill=(255, 255, 255))
+    draw.text((25, 15), "JEDI ARCHIVE", fill=(255, 214, 10))
+    draw.text((25, 50), "COMPATIBILITY CHECK", fill=(83, 210, 255))
+    draw.text((25, 82), "NO DISINTEGRATIONS", fill=(255, 214, 10))
+    compat.save(compat_art_path)
+
+    return {
+        "banner": banner_path,
+        "side": side_art_path,
+        "compat": compat_art_path,
+    }
+
+
+def apply_theme_art(
+    worksheet: xlwt.Worksheet,
+    sheet_name: str,
+    theme: ThemeProfile,
+    assets: dict[str, Path] | None,
+) -> None:
+    if theme.name != "star-wars" or not assets:
+        return
+    if sheet_name == "Current":
+        worksheet.insert_bitmap(str(assets["banner"]), 0, 0, scale_x=0.72, scale_y=0.72)
+        worksheet.insert_bitmap(str(assets["side"]), 71, 9, scale_x=0.55, scale_y=0.55)
+    elif sheet_name == "Template":
+        worksheet.insert_bitmap(str(assets["banner"]), 0, 0, scale_x=0.72, scale_y=0.72)
+    elif sheet_name == "Compatibility Report":
+        worksheet.insert_bitmap(str(assets["compat"]), 0, 1, scale_x=0.68, scale_y=0.68)
+
+
 def restyle_sheet(
     book: xlrd.book.Book,
     workbook: xlwt.Workbook,
     sheet_name: str,
     theme: ThemeProfile,
     output_filename: str,
+    assets: dict[str, Path] | None,
 ) -> None:
     source = book.sheet_by_name(sheet_name)
     target = workbook.add_sheet(sheet_name, cell_overwrite_ok=True)
@@ -745,7 +945,7 @@ def restyle_sheet(
             cell = source.cell(source_rowx, colx) if source_rowx < source.nrows and colx < source.ncols else xlrd.sheet.Cell(
                 xlrd.XL_CELL_EMPTY, ""
             )
-            value = output_cell_value(sheet_name, output_filename, source_rowx, colx, cell)
+            value = themed_cell_value(theme, sheet_name, output_filename, source_rowx, colx, cell)
             fmt = format_for_cell(book, source, source_rowx, colx) if source_rowx < source.nrows and colx < source.ncols else "General"
             spec = style_spec_for_cell(theme, sheet_name, role, target_rowx, colx, value, fmt)
             style = style_factory.make(spec, fmt if fmt else "General")
@@ -756,6 +956,8 @@ def restyle_sheet(
             else:
                 write_value(target, target_rowx, colx, cell, value, style)
 
+    apply_theme_art(target, sheet_name, theme, assets)
+
 
 def build_workbook(input_path: str, output_path: str, theme_name: str = "classic") -> None:
     source_book = xlrd.open_workbook(input_path, formatting_info=True)
@@ -764,11 +966,11 @@ def build_workbook(input_path: str, output_path: str, theme_name: str = "classic
     output_filename = Path(output_path).name
     configure_palette(target_book, theme.palette)
     target_book._style_factory = StyleFactory(target_book, theme.palette)  # type: ignore[attr-defined]
-
-    for sheet_name in source_book.sheet_names():
-        restyle_sheet(source_book, target_book, sheet_name, theme, output_filename)
-
-    target_book.save(output_path)
+    with TemporaryDirectory() as tmpdir:
+        assets = create_star_wars_assets(Path(tmpdir)) if theme.name == "star-wars" else None
+        for sheet_name in source_book.sheet_names():
+            restyle_sheet(source_book, target_book, sheet_name, theme, output_filename, assets)
+        target_book.save(output_path)
 
 
 def parse_args() -> argparse.Namespace:
