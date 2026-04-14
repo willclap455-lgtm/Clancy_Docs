@@ -7,7 +7,10 @@ import xlrd
 import xlwt
 
 
-TITLE_COLS_CURRENT = 9
+MAIN_TABLE_LAST_COL = 8
+CURRENT_FORMULA_COL = 9
+CURRENT_FORMULA_WIDTH = 2816
+TEMPLATE_LAST_COL = 8
 
 PALETTE = {
     "navy": (0x21, (31, 53, 79)),
@@ -144,7 +147,7 @@ def row_role(sheet_name: str, sheet: xlrd.sheet.Sheet, rowx: int) -> str:
 
     if sheet_name == "Current" and rowx == 1:
         return "title"
-    if sheet_name == "Template" and rowx in {0, 6}:
+    if sheet_name == "Template" and rowx == 6:
         return "title"
 
     if col0 in {"Total Sent:", "Total Rec:", "Not Found:"}:
@@ -167,6 +170,25 @@ def row_role(sheet_name: str, sheet: xlrd.sheet.Sheet, rowx: int) -> str:
     return "body"
 
 
+def should_skip_row(sheet_name: str, sheet: xlrd.sheet.Sheet, rowx: int) -> bool:
+    if sheet_name not in {"Current", "Template"}:
+        return False
+
+    col0 = str(sheet.cell_value(rowx, 0)).strip().lower() if sheet.ncols > 0 else ""
+    col1 = normalize_status(sheet.cell_value(rowx, 1)) if sheet.ncols > 1 else ""
+    prev_col0 = str(sheet.cell_value(rowx - 1, 0)).strip().lower() if rowx > 0 and sheet.ncols > 0 else ""
+
+    if "republic parking" in col0 or col0.startswith("no need to do republic"):
+        return True
+    return col1 == "rec'd" and (
+        "republic parking" in prev_col0 or prev_col0.startswith("no need to do republic")
+    )
+
+
+def retained_rows(sheet_name: str, sheet: xlrd.sheet.Sheet) -> list[int]:
+    return [rowx for rowx in range(sheet.nrows) if not should_skip_row(sheet_name, sheet, rowx)]
+
+
 def style_spec_for_cell(
     sheet_name: str,
     role: str,
@@ -178,65 +200,55 @@ def style_spec_for_cell(
     centered = ThemeStyle(horz=xlwt.Alignment.HORZ_CENTER, vert=xlwt.Alignment.VERT_CENTER)
     centered_right = ThemeStyle(horz=xlwt.Alignment.HORZ_RIGHT, vert=xlwt.Alignment.VERT_CENTER)
 
+    if sheet_name == "Current" and colx == CURRENT_FORMULA_COL:
+        return ThemeStyle(
+            font_height=200,
+            border_colour="stone",
+            left=0,
+            right=0,
+            top=0,
+            bottom=0,
+            horz=xlwt.Alignment.HORZ_CENTER,
+            wrap=False,
+        )
+
     if role == "title":
         return ThemeStyle(
-            font_height=320,
+            font_height=300,
             bold=True,
-            font_colour="white",
-            bg_colour="navy",
-            border_colour="navy",
+            font_colour="navy",
+            border_colour="slate",
+            left=0,
+            right=0,
+            top=0,
+            bottom=2,
             horz=xlwt.Alignment.HORZ_CENTER,
-            wrap=True,
+            wrap=False,
         )
 
     if role == "section_header":
-        if colx == 0:
-            return ThemeStyle(
-                font_height=220,
-                bold=True,
-                font_colour="white",
-                bg_colour="slate",
-                border_colour="navy",
-                left=2,
-                right=2,
-                top=2,
-                bottom=2,
-            )
-        if str(value).strip().upper() == "TOTAL":
-            return ThemeStyle(
-                font_height=220,
-                bold=True,
-                font_colour="white",
-                bg_colour="gold",
-                border_colour="navy",
-                left=2,
-                right=2,
-                top=2,
-                bottom=2,
-                horz=xlwt.Alignment.HORZ_CENTER,
-            )
         return ThemeStyle(
             font_height=220,
             bold=True,
-            font_colour="white",
-            bg_colour="slate",
-            border_colour="navy",
-            left=2,
-            right=2,
-            top=2,
+            font_colour="navy",
+            bg_colour="mist",
+            border_colour="slate",
+            left=1,
+            right=1,
+            top=1,
             bottom=2,
-            horz=xlwt.Alignment.HORZ_CENTER,
+            horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
         )
 
     if role == "total_sent":
-        bg_colour = "gold"
-        font_colour = "white"
+        bg_colour = "mist"
+        font_colour = "navy"
     elif role == "total_rec":
-        bg_colour = "sage"
-        font_colour = "white"
+        bg_colour = "ivory"
+        font_colour = "navy"
     elif role == "not_found":
-        bg_colour = "coral"
-        font_colour = "white"
+        bg_colour = None
+        font_colour = "navy"
     else:
         bg_colour = None
         font_colour = "black"
@@ -248,10 +260,10 @@ def style_spec_for_cell(
                 bold=True,
                 font_colour=font_colour,
                 bg_colour=bg_colour,
-                border_colour="navy",
-                left=2,
-                right=2,
-                top=2,
+                border_colour="slate",
+                left=1,
+                right=1,
+                top=1,
                 bottom=2,
                 horz=xlwt.Alignment.HORZ_RIGHT,
             )
@@ -260,10 +272,10 @@ def style_spec_for_cell(
             bold=True,
             font_colour=font_colour,
             bg_colour=bg_colour,
-            border_colour="navy",
-            left=2,
-            right=2,
-            top=2,
+            border_colour="slate",
+            left=1,
+            right=1,
+            top=1,
             bottom=2,
             horz=xlwt.Alignment.HORZ_CENTER,
         )
@@ -271,9 +283,8 @@ def style_spec_for_cell(
     if role == "note":
         return ThemeStyle(
             bold=colx == 7,
-            italic=colx in {0, 1},
             font_colour="navy",
-            bg_colour="mist",
+            bg_colour="ivory",
             border_colour="slate",
             left=1,
             right=1,
@@ -283,7 +294,7 @@ def style_spec_for_cell(
         )
 
     if role in {"sent", "received", "body"}:
-        bg_colour = "ivory" if role == "sent" else "mist" if role == "received" else None
+        bg_colour = "mist" if role == "received" else None
         spec = ThemeStyle(
             font_height=200,
             font_colour="navy" if role != "body" else "black",
@@ -306,15 +317,13 @@ def style_spec_for_cell(
                 font_height=200,
                 bold=True,
                 font_colour="navy",
-                bg_colour="gold",
-                border_colour="slate",
+                border_colour="stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
         if "%" in fmt or colx >= 8:
             return ThemeStyle(
                 font_height=200,
                 font_colour="navy",
-                bg_colour="mist" if role == "sent" else "ivory",
                 border_colour="stone",
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
@@ -366,13 +375,19 @@ def style_spec_for_cell(
     return ThemeStyle()
 
 
-def merged_ranges(sheet_name: str, sheet: xlrd.sheet.Sheet, max_col: int) -> dict[tuple[int, int], tuple[int, int, int, int]]:
+def merged_ranges(
+    sheet_name: str,
+    sheet: xlrd.sheet.Sheet,
+    row_map: dict[int, int],
+    max_col: int,
+) -> dict[tuple[int, int], tuple[int, int, int, int]]:
     merged: dict[tuple[int, int], tuple[int, int, int, int]] = {
-        (row_lo, col_lo): (row_lo, row_hi - 1, col_lo, col_hi - 1)
+        (row_map[row_lo], col_lo): (row_map[row_lo], row_map[row_hi - 1], col_lo, min(col_hi - 1, max_col))
         for row_lo, row_hi, col_lo, col_hi in sheet.merged_cells
+        if all(rowx in row_map for rowx in range(row_lo, row_hi)) and col_lo <= max_col
     }
-    if sheet_name == "Current":
-        merged[(1, 0)] = (1, 1, 0, max_col)
+    if sheet_name == "Current" and 1 in row_map:
+        merged[(row_map[1], 0)] = (row_map[1], row_map[1], 0, MAIN_TABLE_LAST_COL)
     return merged
 
 
@@ -412,14 +427,17 @@ def restyle_sheet(book: xlrd.book.Book, workbook: xlwt.Workbook, sheet_name: str
     source = book.sheet_by_name(sheet_name)
     target = workbook.add_sheet(sheet_name, cell_overwrite_ok=True)
     style_factory = workbook._style_factory  # type: ignore[attr-defined]
+    rows = retained_rows(sheet_name, source)
+    row_map = {source_rowx: target_rowx for target_rowx, source_rowx in enumerate(rows)}
 
-    max_row, max_col = content_bounds(source)
+    _, max_col = content_bounds(source)
+    max_row = len(rows) - 1
     if sheet_name == "Template":
-        max_col = max(max_col, 14)
+        max_col = TEMPLATE_LAST_COL
     if sheet_name == "Current":
-        max_col = max(max_col, TITLE_COLS_CURRENT)
+        max_col = max(max_col, CURRENT_FORMULA_COL)
 
-    merged = merged_ranges(sheet_name, source, max_col)
+    merged = merged_ranges(sheet_name, source, row_map, max_col)
     covered = covered_cells(merged)
 
     if sheet_name == "Compatibility Report":
@@ -434,30 +452,33 @@ def restyle_sheet(book: xlrd.book.Book, workbook: xlwt.Workbook, sheet_name: str
             target.row(rowx).height = source_row.height if source_row else 360
     else:
         for colx in range(max_col + 1):
-            target.col(colx).width = 4096
+            if sheet_name == "Current" and colx == CURRENT_FORMULA_COL:
+                target.col(colx).width = CURRENT_FORMULA_WIDTH
+            else:
+                target.col(colx).width = 4096
 
         for rowx in range(max_row + 1):
             target.row(rowx).height_mismatch = True
             target.row(rowx).height = 420
 
-    for rowx in range(max_row + 1):
-        role = row_role(sheet_name, source, rowx)
+    for target_rowx, source_rowx in enumerate(rows):
+        role = row_role(sheet_name, source, source_rowx)
         for colx in range(max_col + 1):
-            if (rowx, colx) in covered and (rowx, colx) not in merged:
+            if (target_rowx, colx) in covered and (target_rowx, colx) not in merged:
                 continue
 
-            cell = source.cell(rowx, colx) if rowx < source.nrows and colx < source.ncols else xlrd.sheet.Cell(
+            cell = source.cell(source_rowx, colx) if source_rowx < source.nrows and colx < source.ncols else xlrd.sheet.Cell(
                 xlrd.XL_CELL_EMPTY, ""
             )
-            fmt = format_for_cell(book, source, rowx, colx) if rowx < source.nrows and colx < source.ncols else "General"
-            spec = style_spec_for_cell(sheet_name, role, rowx, colx, cell.value, fmt)
+            fmt = format_for_cell(book, source, source_rowx, colx) if source_rowx < source.nrows and colx < source.ncols else "General"
+            spec = style_spec_for_cell(sheet_name, role, target_rowx, colx, cell.value, fmt)
             style = style_factory.make(spec, fmt if fmt else "General")
 
-            if (rowx, colx) in merged:
-                row_lo, row_hi, col_lo, col_hi = merged[(rowx, colx)]
+            if (target_rowx, colx) in merged:
+                row_lo, row_hi, col_lo, col_hi = merged[(target_rowx, colx)]
                 target.write_merge(row_lo, row_hi, col_lo, col_hi, cell.value, style)
             else:
-                write_value(target, rowx, colx, cell, style)
+                write_value(target, target_rowx, colx, cell, style)
 
 
 def build_workbook(input_path: str, output_path: str) -> None:
