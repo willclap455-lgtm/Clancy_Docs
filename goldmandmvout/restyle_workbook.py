@@ -35,6 +35,17 @@ CLANCY_PALETTE = {
     "stone": (0x28, (190, 190, 190)),
 }
 
+CLANCY_LIGHT_PALETTE = {
+    "navy": (0x21, (36, 46, 55)),
+    "slate": (0x22, (41, 52, 62)),
+    "mist": (0x23, (242, 245, 249)),
+    "ivory": (0x24, (255, 255, 255)),
+    "gold": (0x25, (255, 96, 0)),
+    "coral": (0x26, (255, 212, 141)),
+    "sage": (0x27, (120, 120, 120)),
+    "stone": (0x28, (190, 190, 190)),
+}
+
 
 @dataclass(frozen=True)
 class ThemeProfile:
@@ -50,6 +61,13 @@ THEMES = {
     "clancy": ThemeProfile(
         name="clancy",
         palette=CLANCY_PALETTE,
+        title_font_name="Exo",
+        heading_font_name="Exo",
+        body_font_name="Arial",
+    ),
+    "clancy-light": ThemeProfile(
+        name="clancy-light",
+        palette=CLANCY_LIGHT_PALETTE,
         title_font_name="Exo",
         heading_font_name="Exo",
         body_font_name="Arial",
@@ -232,7 +250,9 @@ def style_spec_for_cell(
     value: object,
     fmt: str,
 ) -> ThemeStyle:
-    is_clancy = theme.name == "clancy"
+    is_clancy_dark = theme.name == "clancy"
+    is_clancy_light = theme.name == "clancy-light"
+    is_clancy = is_clancy_dark or is_clancy_light
     title_font = theme.title_font_name
     heading_font = theme.heading_font_name
     body_font = theme.body_font_name
@@ -254,6 +274,21 @@ def style_spec_for_cell(
         )
 
     if role == "title":
+        if is_clancy_light:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=320,
+                bold=True,
+                font_colour="navy",
+                bg_colour="ivory",
+                border_colour="gold",
+                left=0,
+                right=0,
+                top=0,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_CENTER,
+                wrap=False,
+            )
         return ThemeStyle(
             font_name=title_font,
             font_height=320 if is_clancy else 300,
@@ -284,6 +319,20 @@ def style_spec_for_cell(
                 bottom=2,
                 horz=xlwt.Alignment.HORZ_CENTER,
             )
+        if is_clancy_light:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="mist",
+                border_colour="gold",
+                left=1,
+                right=1,
+                top=1,
+                bottom=2,
+                horz=xlwt.Alignment.HORZ_LEFT if colx == 0 else xlwt.Alignment.HORZ_CENTER,
+            )
         return ThemeStyle(
             font_name=heading_font,
             font_height=220,
@@ -299,14 +348,35 @@ def style_spec_for_cell(
         )
 
     if role == "total_sent":
-        bg_colour = "navy" if is_clancy else "mist"
-        font_colour = "white" if is_clancy else "navy"
+        if is_clancy_dark:
+            bg_colour = "navy"
+            font_colour = "white"
+        elif is_clancy_light:
+            bg_colour = "mist"
+            font_colour = "navy"
+        else:
+            bg_colour = "mist"
+            font_colour = "navy"
     elif role == "total_rec":
-        bg_colour = "slate" if is_clancy else "ivory"
-        font_colour = "white" if is_clancy else "navy"
+        if is_clancy_dark:
+            bg_colour = "slate"
+            font_colour = "white"
+        elif is_clancy_light:
+            bg_colour = "ivory"
+            font_colour = "navy"
+        else:
+            bg_colour = "ivory"
+            font_colour = "navy"
     elif role == "not_found":
-        bg_colour = "gold" if is_clancy else None
-        font_colour = "white" if is_clancy else "navy"
+        if is_clancy_dark:
+            bg_colour = "gold"
+            font_colour = "white"
+        elif is_clancy_light:
+            bg_colour = "coral"
+            font_colour = "navy"
+        else:
+            bg_colour = None
+            font_colour = "navy"
     else:
         bg_colour = None
         font_colour = "black"
@@ -332,7 +402,7 @@ def style_spec_for_cell(
             bold=True,
             font_colour=font_colour,
             bg_colour=bg_colour,
-            border_colour="gold" if is_clancy else "slate",
+                border_colour="gold" if is_clancy else "slate",
             left=1,
             right=1,
             top=1,
@@ -345,7 +415,7 @@ def style_spec_for_cell(
             font_name=body_font,
             bold=colx == 7,
             font_colour="sage" if is_clancy else "navy",
-            bg_colour="mist" if is_clancy else "ivory",
+            bg_colour="mist" if is_clancy_dark else "ivory" if is_clancy_light else "ivory",
             border_colour="gold" if is_clancy else "slate",
             left=1,
             right=1,
@@ -355,7 +425,12 @@ def style_spec_for_cell(
         )
 
     if role in {"sent", "received", "body"}:
-        bg_colour = "mist" if role == "received" else "ivory" if is_clancy and colx <= MAIN_TABLE_LAST_COL else None
+        if is_clancy_dark:
+            bg_colour = "mist" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        elif is_clancy_light:
+            bg_colour = "mist" if role == "received" else "ivory" if colx <= MAIN_TABLE_LAST_COL else None
+        else:
+            bg_colour = "mist" if role == "received" else None
         spec = ThemeStyle(
             font_name=body_font,
             font_height=200,
@@ -406,6 +481,16 @@ def style_spec_for_cell(
         return spec
 
     if role == "compat_title":
+        if is_clancy_light:
+            return ThemeStyle(
+                font_name=title_font,
+                font_height=240,
+                bold=True,
+                font_colour="navy",
+                bg_colour="ivory",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_LEFT,
+            )
         return ThemeStyle(
             font_name=title_font,
             font_height=240,
@@ -417,6 +502,16 @@ def style_spec_for_cell(
         )
 
     if role == "compat_header":
+        if is_clancy_light:
+            return ThemeStyle(
+                font_name=heading_font,
+                font_height=220,
+                bold=True,
+                font_colour="navy",
+                bg_colour="coral",
+                border_colour="gold",
+                horz=xlwt.Alignment.HORZ_CENTER if colx >= 4 else xlwt.Alignment.HORZ_LEFT,
+            )
         return ThemeStyle(
             font_name=heading_font,
             font_height=220,
