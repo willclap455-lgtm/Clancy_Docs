@@ -1,3 +1,7 @@
-# Goldman Speadsheet Repo
+# CLANCY DOCS
 
-This repository contains the goldman DMV spreadsheet we use to record DMV values from Colorado DMV and Goldman Lexus Nexus 
+This repository contains a random collection of Clancy Docs for improvements, enhancements, revamps, as well as backup purposes. 
+
+
+
+
